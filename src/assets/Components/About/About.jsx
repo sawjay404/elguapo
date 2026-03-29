@@ -1,169 +1,125 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ShieldCheck, 
-  Users, 
-  Clock, 
-  MapPin, 
-  X, 
-  Send, 
-  ArrowRight,
-  CheckCircle2
-} from "lucide-react";
+import React, { useEffect, useRef } from 'react';
+import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
+import { Award, ShieldCheck, Clock, ThumbsUp } from 'lucide-react';
 
-export default function About() {
-  const [isFormOpen, setIsFormOpen] = useState(false);
+// --- INTEGRATED COUNTER COMPONENT ---
+const Counter = ({ value, decimals = 0 }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { damping: 40, stiffness: 100 });
 
+  useEffect(() => {
+    if (isInView) motionValue.set(value);
+  }, [isInView, value, motionValue]);
+
+  useEffect(() => {
+    springValue.on("change", (latest) => {
+      if (ref.current) {
+        ref.current.textContent = latest.toFixed(decimals);
+      }
+    });
+  }, [springValue, decimals]);
+
+  return <span ref={ref}>0</span>;
+};
+
+const About = () => {
   const stats = [
-    { label: "Projects Done", value: "500+", icon: <CheckCircle2 className="text-orange-500" /> },
-    { label: "Happy Clients", value: "100%", icon: <Users className="text-blue-500" /> },
-    { label: "Response Time", value: "24h", icon: <Clock className="text-emerald-500" /> },
-    { label: "NJ Counties", value: "5+", icon: <MapPin className="text-red-500" /> },
+    { icon: <Award size={18} />, value: 5, suffix: "+", label: "Years", sub: "Mastery" },
+    { icon: <ShieldCheck size={18} />, value: 100, suffix: "%", label: "Certified", sub: "Technicians" },
+    { icon: <Clock size={18} />, value: 24, suffix: "/7", label: "Weekly", sub: "Precision" },
+    { icon: <ThumbsUp size={18} />, value: 100, suffix: "%", label: "Guaranteed", sub: "Satisfaction" },
   ];
 
-  const containerVars = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
-  };
-
-  const revealItem = {
-    hidden: { opacity: 0, scale: 0.96, filter: "blur(10px)" },
-    show: { 
-      opacity: 1, 
-      scale: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", damping: 25, stiffness: 120 } 
-    }
-  };
-
   return (
-    <motion.section
-      id="about"
-      variants={containerVars}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.2 }}
-      className="relative w-full min-h-screen py-24 lg:py-0 bg-slate-100 overflow-hidden flex items-center justify-center px-6"
-    >
-      
-      {/* --- BACKGROUND (CONSISTENT WITH SERVICES) --- */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[60%] bg-orange-300/40 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[50%] bg-slate-400/40 blur-[120px] rounded-full" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/carbon-fibre.png')` }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] h-[92%] border border-white/50 rounded-[4rem] pointer-events-none" />
-      </div>
+    // FIXED: Changed bg-white to bg-slate-50 (Slight Grey)
+    <section id="about" className="py-16 md:py-40 bg-slate-50 overflow-hidden scroll-mt-20">
+      <div className="container mx-auto px-6 md:px-16 max-w-7xl">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-32">
+          
+          {/* Left Side: Pool Image - FIXED Size for Mobile */}
+          <motion.div 
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="w-full lg:w-5/12"
+          >
+            {/* FIXED: Reduced rounded corners and border-width for mobile */}
+            <div className="relative rounded-[2rem] md:rounded-[4rem] overflow-hidden shadow-2xl border-4 md:border-8 border-white">
+              <img 
+                src="https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&q=80&w=1200" 
+                alt="Luxury Pool" 
+                // FIXED: Changed mobile height to 300px (from 500px)
+                className="w-full h-[300px] md:h-[700px] object-cover hover:scale-105 transition-transform duration-700"
+              />
+            </div>
+          </motion.div>
 
-      {/* --- FORM MODAL (HOMEPAGE MATCH) --- */}
-      <AnimatePresence>
-        {isFormOpen && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsFormOpen(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-[3rem] p-8 lg:p-12 shadow-2xl"
+          {/* Right Side: Content */}
+          <div className="w-full lg:w-7/12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
             >
-              <button onClick={() => setIsFormOpen(false)} className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 transition-colors">
-                <X size={28} />
-              </button>
-              <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase mb-2">Get Your <span className="text-orange-500">Quote</span></h2>
-              <p className="text-slate-500 font-medium mb-8">Ready for professional home maintenance?</p>
+              <span className="text-[#06b6d4] font-black uppercase tracking-[0.5em] text-[10px] block mb-4 md:mb-6">
+                Redefining Maintenance
+              </span>
               
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Full Name</label>
-                  <input type="text" placeholder="John Doe" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 outline-none" />
+              <h2 className="text-4xl md:text-8xl font-black text-slate-900 leading-[0.9] md:leading-[0.85] uppercase tracking-tighter mb-6 md:mb-10">
+                WAVY IS <br />
+                <span className="text-[#06b6d4]">Effortless.</span>
+              </h2>
+              
+              <p className="text-slate-600 font-bold text-sm md:text-lg leading-relaxed max-w-xl mb-10 md:mb-12">
+                We believe your pool should be a source of relaxation, not a second job. 
+                Our team blends high-tech water analysis with precision care.
+              </p>
+
+              {/* Counting Stats Grid - Matching the 2x2 Style */}
+              <div className="grid grid-cols-2 gap-y-8 gap-x-4 border-t border-slate-200 pt-10">
+                {stats.map((item, idx) => (
+                  <div key={idx} className="group flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-3 md:gap-5">
+                    <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-[#06b6d4] group-hover:bg-[#06b6d4] group-hover:text-white transition-colors duration-300">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <div className="text-xl md:text-4xl font-black text-slate-900 tracking-tighter">
+                        <Counter value={item.value} />{item.suffix} <span className="text-xs md:text-2xl">{item.label}</span>
+                      </div>
+                      <p className="text-slate-400 font-bold text-[9px] uppercase tracking-[0.2em] mt-1">{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Founder Quote Card - FIXED Padding for Mobile */}
+              <div className="mt-12 p-6 md:p-8 bg-slate-900 rounded-[2rem] md:rounded-[3rem] text-white flex flex-row items-center gap-4 md:gap-6 relative overflow-hidden">
+                <div className="shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl overflow-hidden border-2 border-[#06b6d4] rotate-3 shadow-xl">
+                  <img 
+                    src="https://i.pravatar.cc/150?u=jay" 
+                    alt="Jay Benitez" 
+                    className="w-full h-full object-cover grayscale" 
+                  />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Email Address</label>
-                  <input type="email" placeholder="john@example.com" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-orange-500/20 outline-none" />
+                <div>
+                  <p className="text-[11px] md:text-base font-medium italic text-slate-300 leading-tight">
+                    "Crystal clear water and complete peace of mind for every homeowner."
+                  </p>
+                  <p className="mt-1 md:mt-2 font-black uppercase text-[#06b6d4] tracking-[0.2em] md:tracking-[0.3em] text-[8px] md:text-[10px]">
+                    Jay Benitez — Founder
+                  </p>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Service Required</label>
-                  <textarea placeholder="Tell us about the project..." className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl h-24 resize-none outline-none focus:ring-2 focus:ring-orange-500/20" />
-                </div>
-                <button className="w-full py-5 bg-orange-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-orange-600 shadow-xl transition-all flex items-center justify-center gap-3 mt-4">
-                  Send Quote Request <Send size={18} />
-                </button>
-              </form>
+              </div>
             </motion.div>
           </div>
-        )}
-      </AnimatePresence>
-
-      <div className="relative z-10 max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        
-        {/* --- LEFT: CONTENT --- */}
-        <div className="space-y-8">
-          <motion.div variants={revealItem} className="inline-flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur-md shadow-sm border border-white rounded-full w-fit">
-            <ShieldCheck size={18} className="text-orange-500" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">About Our Company</span>
-          </motion.div>
-
-          <motion.h2 variants={revealItem} className="text-6xl lg:text-8xl font-black text-slate-900 tracking-tighter leading-[0.85] uppercase">
-            The Gold <br /> <span className="text-orange-500 italic uppercase">Standard.</span>
-          </motion.h2>
-
-          <motion.p variants={revealItem} className="text-slate-600 text-lg font-medium leading-relaxed max-w-xl">
-            Based in New Jersey, we provide premium handyman services for homeowners who value precision, cleanliness, and reliability. From small repairs to smart home upgrades, we treat every house like our own.
-          </motion.p>
-
-          <motion.div variants={revealItem} className="grid grid-cols-2 gap-4">
-            {stats.map((stat, i) => (
-              <div key={i} className="p-6 bg-white/60 backdrop-blur-md rounded-3xl border border-white shadow-sm flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  {stat.icon}
-                  <span className="text-2xl font-black text-slate-900">{stat.value}</span>
-                </div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</span>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.button
-            variants={revealItem}
-            onClick={() => setIsFormOpen(true)}
-            className="w-fit px-12 py-6 bg-slate-900 text-white rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-2xl hover:bg-orange-600 transition-all flex items-center gap-4"
-          >
-            Work With Us <ArrowRight size={20} />
-          </motion.button>
         </div>
-
-        {/* --- RIGHT: VISUAL ELEMENT --- */}
-        <motion.div variants={revealItem} className="relative group">
-          <div className="absolute -inset-4 bg-orange-500/10 rounded-[4rem] blur-2xl group-hover:bg-orange-500/20 transition-all" />
-          <div className="relative bg-slate-900 rounded-[4rem] p-12 lg:p-20 overflow-hidden shadow-2xl">
-             {/* Decorative Patterns */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 blur-[80px] rounded-full" />
-            <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/10 blur-[60px] rounded-full" />
-            
-            <h3 className="text-white font-black uppercase tracking-widest text-xs mb-8 flex items-center gap-3">
-              <span className="w-8 h-[1px] bg-orange-500"></span> 
-              Our Mission
-            </h3>
-            <p className="text-2xl lg:text-3xl font-black text-white uppercase tracking-tighter leading-tight italic">
-              "To provide <span className="text-orange-500">stress-free</span> home maintenance so you can focus on what matters most."
-            </p>
-            
-            <div className="mt-12 flex flex-wrap gap-4">
-              {['Licensed', 'Insured', 'NJ Local', 'Expert'].map((tag) => (
-                <span key={tag} className="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-white uppercase tracking-widest">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </motion.div>
       </div>
-    </motion.section>
+    </section>
   );
-}
+};
+
+export default About;
