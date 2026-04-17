@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweHJ3EQa2pXTH43Cp7qlDOYSb-Y0glfLxhGWU1dmitdpXifGKDscEK6JOgU-Kq0GW2Ww/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXPnhJn-XPG4YVqobPUvlWq3dbyHLPynCq_8AiFU0Ic7QRpACQNFwOLikfqvE8ul4ewA/exec";
 
 const Login = ({ setIsAuthenticated }) => {
   const [password, setPassword] = useState('');
