@@ -1,189 +1,291 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Instagram, ArrowUpRight, ShoppingBag, Loader2, Search, Sun, Moon, Sparkles, Star } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  Instagram,
+  Youtube,
+  Search,
+  Sun,
+  Moon,
+  Star,
+  Heart,
+  CheckCircle,
+  ShieldCheck,
+  Link,
+  Zap,
+  Shirt,
+  Headphones,
+  Flame,
+  ArrowRight,
+  ExternalLink,
+  Truck,
+  ChevronRight,
+  ShoppingBag
+} from "lucide-react";
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXPnhJn-XPG4YVqobPUvlWq3dbyHLPynCq_8AiFU0Ic7QRpACQNFwOLikfqvE8ul4ewA/exec";
+
+const ScrollStyles = () => (
+  <style dangerouslySetInnerHTML={{ __html: `
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .glass-badge { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+  `}} />
+);
 
 const Home = ({ isDarkMode, toggleTheme }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const suggestionRef = useRef(null);
 
   useEffect(() => {
     fetch(SCRIPT_URL)
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-        setFilteredProducts(data);
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+          setFilteredProducts(data);
+        }
         setLoading(false);
       })
-      .catch(err => {
-        console.error("Error fetching data:", err);
+      .catch((err) => {
+        console.error("Fetch error:", err);
         setLoading(false);
       });
   }, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    const filtered = products.filter(p => 
-      p.title.toLowerCase().includes(query.toLowerCase()) || 
-      p.category.toLowerCase().includes(query.toLowerCase()) ||
-      p.id.toString().includes(query)
-    );
+    const filtered = products.filter((p) => {
+      const title = p.title?.toLowerCase() || "";
+      const category = p.category?.toLowerCase() || "";
+      return title.includes(query.toLowerCase()) || category.includes(query.toLowerCase());
+    });
     setFilteredProducts(filtered);
   };
 
+  const renderStars = (rating) => {
+    const r = parseFloat(rating) || 5;
+    return [...Array(5)].map((_, i) => (
+      <Star 
+        key={i} 
+        size={10} 
+        className={`${i < Math.floor(r) ? 'text-orange-400 fill-orange-400' : 'text-zinc-200 dark:text-zinc-700'}`} 
+      />
+    ));
+  };
+
   return (
-    <div className="min-h-screen transition-colors duration-700 bg-[#FAFAFA] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-[#EE4D2D] selection:text-white">
+    <div className="min-h-screen bg-[#FDFDFD] dark:bg-[#0A0A0A] text-slate-900 dark:text-zinc-100 transition-colors duration-300 font-sans pb-10">
+      <ScrollStyles />
       
-      {/* TIKTOK STYLE ANNOUNCEMENT */}
-      <div className="bg-[#EE4D2D] text-white text-[9px] font-black py-2 px-4 text-center uppercase tracking-[0.4em] sticky top-0 z-[60] shadow-sm flex items-center justify-center gap-3">
-        <Sparkles size={10} /> 
-        Viral Shopee Finds — Updated Daily 
-        <Sparkles size={10} />
+      <div className="bg-[#EE4D2D] text-white text-[9px] font-black py-2.5 text-center uppercase tracking-[0.2em]">
+        OFFICIAL AFFILIATE DIRECTORY — REDIRECTS TO SHOPEE.PH
       </div>
 
-      <nav className="sticky top-[29px] z-50 bg-white/70 dark:bg-black/70 backdrop-blur-2xl border-b border-gray-100 dark:border-white/5 px-6 py-4 flex justify-between items-center w-full">
-        <div className="flex items-center gap-2 group cursor-pointer">
-          <img src="/guapo.png" alt="Logo" className="w-9 h-9 object-contain group-hover:rotate-12 transition-transform duration-500" />
-          <h1 className="text-2xl font-black tracking-tighter italic leading-none text-[#EE4D2D]">EL GUAPO</h1>
-        </div>
-        
-        <div className="hidden md:block relative w-1/3">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-          <input 
-            type="text"
-            placeholder="Search the drops..."
-            className="w-full bg-gray-100/50 dark:bg-white/5 border border-transparent focus:border-[#EE4D2D]/20 rounded-2xl py-3 pl-14 pr-4 text-xs outline-none transition-all font-bold placeholder:text-gray-400 dark:placeholder:text-gray-600"
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button onClick={toggleTheme} className="p-3 rounded-2xl bg-white dark:bg-white/5 shadow-sm border border-gray-100 dark:border-white/5 hover:text-[#EE4D2D] transition-all active:scale-90">
-            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-          <a href="#" className="p-3 rounded-2xl bg-white dark:bg-white/5 shadow-sm border border-gray-100 dark:border-white/5 text-gray-400 hover:text-[#EE4D2D] transition-all active:scale-90">
-            <Instagram size={18}/>
-          </a>
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-900 px-4">
+        <div className="max-w-4xl mx-auto h-16 flex justify-between items-center">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-white p-1 rounded-lg shadow-sm border border-zinc-100">
+              <img src="/guapo.png" className="w-8 h-8 object-contain" alt="Logo" />
+            </div>
+            <h1 className="font-black italic text-lg md:text-xl tracking-tighter uppercase">EL GUAPO</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={toggleTheme} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <div className="h-5 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
+            <Instagram size={20} className="text-zinc-600 hover:text-[#EE4D2D] transition-colors cursor-pointer" />
+            <Youtube size={20} className="text-zinc-600 hover:text-[#EE4D2D] transition-colors cursor-pointer" />
+          </div>
         </div>
       </nav>
 
-      <header className="max-w-5xl mx-auto pt-20 pb-12 px-6 text-center">
-        <div className="relative inline-block mb-8">
-          <div className="w-28 h-28 bg-white border-[6px] border-[#EE4D2D] rounded-[2.5rem] mx-auto flex items-center justify-center shadow-2xl overflow-hidden ring-12 ring-orange-500/5 rotate-3 hover:rotate-0 transition-transform duration-700">
-             <img src="/mask.png" alt="Logo" className="w-full h-full object-cover p-3" />
-          </div>
-          <div className="absolute -bottom-2 -right-4 bg-[#EE4D2D] text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-black animate-bounce">
-            LIVE DEALS
-          </div>
-        </div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6">
         
-        <h2 className="text-5xl md:text-7xl font-[1000] uppercase tracking-tight italic leading-[0.9] mb-6">
-  
-  <span className="block text-gray-400 dark:text-gray-500 text-lg md:text-xl tracking-[0.3em] font-black mb-4">
-    VIRAL PICKS
-  </span>
-
-  <span className="block bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 text-transparent bg-clip-text">
-    You’ll Regret Missing
-  </span>
-
-  <span className="block text-[#EE4D2D] mt-2 text-4xl md:text-6xl">
-    ₱500 & Below
-  </span>
-
-</h2>
-
-
-        {/* 🔥 EXTRA TRUST TAGS */}
-        <div className="flex justify-center gap-3 flex-wrap mt-4 mb-6">
-          <span className="text-[9px] font-black px-3 py-2 rounded-full bg-gray-100 dark:bg-white/5">🔥 Trending</span>
-          <span className="text-[9px] font-black px-3 py-2 rounded-full bg-gray-100 dark:bg-white/5">💸 Budget Picks</span>
-          <span className="text-[9px] font-black px-3 py-2 rounded-full bg-gray-100 dark:bg-white/5">⚡ Updated Daily</span>
-        </div>
-
-        <div className="md:hidden relative px-2 max-w-sm mx-auto">
-          <input 
-            type="text"
-            placeholder="Search products..."
-            className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 px-6 text-sm outline-none focus:border-[#EE4D2D] transition-all shadow-xl font-bold"
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
-      </header>
-
-      <main className="max-w-[1400px] mx-auto px-4 md:px-8 pb-32">
-        {loading ? (
-          <div className="flex flex-col items-center py-40">
-            <Loader2 className="animate-spin text-[#EE4D2D] mb-6" size={48} strokeWidth={3} />
-            <p className="text-[10px] uppercase font-black tracking-[0.4em] text-gray-400 animate-pulse">Initializing Boutique...</p>
+        {/* HERO SECTION */}
+        <section className="text-center pt-10">
+          <div className="relative inline-block group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#EE4D2D] to-orange-400 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <img
+              src="/mask.png"
+              className="relative w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full border-4 border-white dark:border-zinc-900 bg-white shadow-2xl"
+              alt="Profile"
+            />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-10">
-            {filteredProducts.map((p) => (
-              <a 
-                key={p.id} 
-                href={p.shopeeUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="group relative bg-white dark:bg-[#0D0D0D] rounded-[3rem] overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-white/5 transition-all duration-700 hover:-translate-y-4 hover:shadow-[#EE4D2D]/10 active:scale-[0.96]"
-              >
-                <div className="relative aspect-[1/1.1] overflow-hidden bg-gray-50 dark:bg-white/5 m-3 rounded-[2.2rem]">
-                  <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
-                  
-                  <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none">
-                    <div className="bg-black/80 backdrop-blur-md text-white text-[9px] font-black px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-xl">
-                       {p.soldCount || "0"} <span className="text-gray-400">SOLD</span>
-                    </div>
-                    <div className="bg-white/90 backdrop-blur-md text-orange-600 text-[10px] font-black px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-xl">
-                      <Star size={10} fill="currentColor" /> {p.rating || "5.0"}
-                    </div>
-                  </div>
 
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#EE4D2D] text-white text-[8px] font-black px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 opacity-0 group-hover:opacity-100 group-hover:bottom-6 transition-all duration-500 scale-90 group-hover:scale-100">
-                    <ShoppingBag size={10} /> SECURE LINK
-                  </div>
-                </div>
+          <h2 className="text-3xl md:text-4xl font-black mt-8 tracking-tighter italic uppercase leading-[0.9] text-zinc-900 dark:text-white">
+            Viral Picks <br/> <span className="text-[#EE4D2D]">On TikTok 🔥</span>
+          </h2>
+          
+          <div className="flex justify-center gap-4 mt-5 text-[10px] md:text-xs font-black text-zinc-400 uppercase tracking-widest">
+            <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-[#EE4D2D]" /> Budget Finds</span>
+            <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-[#EE4D2D]" /> Daily Drops</span>
+          </div>
 
-                <div className="p-6 pt-2 flex flex-col flex-grow">
-                  <span className="text-[10px] font-black text-[#EE4D2D] uppercase tracking-[0.2em] mb-2">{p.category}</span>
-                  
-                  <h3 className="text-[15px] font-[900] leading-tight mb-6 uppercase italic dark:text-gray-100 line-clamp-2 min-h-[2.5rem] group-hover:text-[#EE4D2D] transition-colors">
-                    {p.title}
-                  </h3>
-                  
-                  <div className="mt-auto flex flex-col gap-4">
-                    <div className="flex justify-between items-end">
-                       <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Price Point</span>
-                          <span className="text-2xl font-black text-black dark:text-white tabular-nums">₱{p.estPrice}</span>
-                       </div>
-                       <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover:bg-[#EE4D2D] group-hover:text-white transition-all duration-500 rotate-0 group-hover:rotate-45">
-                          <ArrowUpRight size={24} />
-                       </div>
-                    </div>
+          {/* SEARCH BAR */}
+          <div className="mt-8 relative max-w-xl mx-auto">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+            <input
+              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-sm shadow-xl shadow-zinc-200/50 dark:shadow-none outline-none focus:ring-2 focus:ring-[#EE4D2D]/20 focus:border-[#EE4D2D] transition-all"
+              placeholder="What are you looking for?"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
 
-                    <div className="relative overflow-hidden w-full py-4 bg-[#EE4D2D] text-white text-center text-[11px] font-[1000] uppercase tracking-[0.2em] rounded-2xl transition-all duration-500 shadow-[0_10px_20px_rgba(238,77,45,0.3)] group-hover:shadow-[0_15px_30px_rgba(238,77,45,0.5)]">
-                       <span className="relative z-10 flex items-center justify-center gap-2">SHOP THIS FIND <ArrowUpRight size={16} strokeWidth={3}/></span>
-                       <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                    </div>
+          {/* NOTICE BAR */}
+          <div className="mt-6 max-w-xl mx-auto bg-[#EE4D2D]/5 border-l-[6px] border-[#EE4D2D] p-4 text-left rounded-r-2xl shadow-sm">
+            <p className="text-[12px] md:text-[13px] leading-snug font-medium text-zinc-600 dark:text-zinc-400">
+              <span className="text-[#EE4D2D] font-black uppercase tracking-tighter mr-1">OFFICIAL NOTICE:</span> 
+              All links redirect to authorized Shopee.ph sellers. Prices are subject to change.
+            </p>
+          </div>
+
+          {/* TRUST BADGES */}
+          <div className="mt-6 max-w-2xl mx-auto bg-white dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 rounded-2xl p-4 flex items-center justify-between shadow-sm backdrop-blur-sm">
+            {[
+              { icon: <ShieldCheck size={18} className="text-[#EE4D2D]"/>, label: "Verified", sub: "100% Legit" },
+              { icon: <Star size={18} className="text-orange-400"/>, label: "Curated", sub: "Daily Picks" },
+              { icon: <Link size={18} className="text-orange-600"/>, label: "Official", sub: "Direct Links" }
+            ].map((badge, idx) => (
+              <React.Fragment key={idx}>
+                <div className="flex flex-col md:flex-row items-center gap-2 flex-1">
+                  {badge.icon}
+                  <div className="text-center md:text-left">
+                    <p className="text-[10px] font-black uppercase leading-none">{badge.label}</p>
+                    <p className="text-[8px] text-zinc-400 font-bold uppercase hidden sm:block">{badge.sub}</p>
                   </div>
                 </div>
-              </a>
+                {idx < 2 && <div className="w-[1px] h-8 bg-zinc-100 dark:bg-zinc-800" />}
+              </React.Fragment>
             ))}
           </div>
-        )}
-      </main>
+        </section>
 
-      <footer className="w-full bg-white dark:bg-[#080808] py-32 px-6 text-center border-t border-gray-100 dark:border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[#EE4D2D]/5 blur-[120px] pointer-events-none"></div>
-        <h1 className="text-4xl font-black italic uppercase text-gray-200 dark:text-white/5 tracking-tighter mb-6 relative z-10">EL GUAPO</h1>
-        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.5em] relative z-10">© 2026 Curated Viral Directory — All rights reserved</p>
-      </footer>
+        {/* CATEGORIES */}
+        <section className="mt-12">
+          <div className="flex justify-between items-end mb-4 px-1">
+            <div>
+              <p className="text-[#EE4D2D] text-[10px] font-black uppercase tracking-[0.2em] mb-1">Collections</p>
+              <h3 className="font-black text-xl uppercase tracking-tighter">Browse Categories</h3>
+            </div>
+            <button className="text-zinc-400 text-[10px] font-black uppercase flex items-center gap-1 hover:text-[#EE4D2D] transition-colors">
+              Explore All <ChevronRight size={14}/>
+            </button>
+          </div>
+          <div className="flex overflow-x-auto no-scrollbar gap-3 pb-2">
+            {[
+              { name: 'Trending', icon: <Flame size={14}/> },
+              { name: 'Under ₱300', icon: <Zap size={14}/> },
+              { name: 'Streetwear', icon: <Shirt size={14}/> },
+              { name: 'Tech Finds', icon: <Headphones size={14}/> },
+              { name: 'Home Living', icon: <Truck size={14}/> },
+            ].map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => handleSearch(cat.name === 'Trending' ? '' : cat.name)}
+                className={`flex items-center gap-2 whitespace-nowrap px-6 py-3 rounded-xl text-[11px] font-black uppercase transition-all border ${
+                  searchQuery.toLowerCase() === cat.name.toLowerCase() 
+                  ? 'bg-[#EE4D2D] border-[#EE4D2D] text-white shadow-lg shadow-[#EE4D2D]/30' 
+                  : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-[#EE4D2D]'
+                }`}
+              >
+                {cat.icon}
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* PRODUCT GRID */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {loading ? (
+              <div className="col-span-full py-20 text-center">
+                <div className="w-10 h-10 border-4 border-[#EE4D2D] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="font-black text-zinc-400 text-xs uppercase tracking-[0.3em]">Syncing Feed...</p>
+              </div>
+          ) : filteredProducts.map((p, i) => (
+            <a
+              key={p.id || i}
+              href={p.shopeeUrl || "#"}
+              target="_blank"
+              rel="noreferrer"
+              className="group bg-white dark:bg-zinc-900 rounded-[24px] overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-2xl hover:shadow-[#EE4D2D]/10 transition-all duration-500 hover:-translate-y-2"
+            >
+              {/* IMAGE CONTAINER */}
+              <div className="relative aspect-square overflow-hidden bg-zinc-50 dark:bg-zinc-800">
+                <img 
+                  src={p.image} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  alt={p.title} 
+                />
+                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                  {p.label && (
+                    <span className="text-[8px] font-black px-2.5 py-1 rounded-full bg-[#EE4D2D] text-white uppercase tracking-wider shadow-lg">
+                       {p.label}
+                    </span>
+                  )}
+                  {p.soldCount && (
+                    <span className="glass-badge text-white text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      {p.soldCount} SOLD
+                    </span>
+                  )}
+                </div>
+                <button className="absolute top-3 right-3 bg-white/80 dark:bg-black/50 backdrop-blur-md rounded-full p-2 text-zinc-400 hover:text-[#EE4D2D] shadow-sm transition-colors">
+                  <Heart size={16} />
+                </button>
+              </div>
+
+              {/* CONTENT */}
+              <div className="p-4">
+                <div className="flex items-center gap-1 mb-2">
+                  {renderStars(p.rating)}
+                  <span className="text-[10px] font-bold ml-1 text-zinc-400">{p.rating || "5.0"}</span>
+                </div>
+
+                <h3 className="text-[13px] font-bold leading-tight line-clamp-2 h-[34px] group-hover:text-[#EE4D2D] transition-colors">
+                  <span className="text-[#EE4D2D] font-black mr-1">{i + 1}.</span>
+                  {p.title || "Elite Product Listing"}
+                </h3>
+
+                <div className="mt-3 flex items-baseline gap-1">
+                   <span className="text-[10px] font-black text-[#28A745] uppercase tracking-tighter">Starts at</span>
+                   <span className="text-xl font-black text-[#28A745] tracking-tighter">₱{p.estPrice || "0"}</span>
+                </div>
+
+                {/* UPDATED BUY BUTTON: "Shop on Shopee" */}
+                <div className="mt-4 flex items-center justify-center gap-2 bg-[#EE4D2D] text-white py-3 rounded-2xl text-[10px] font-black tracking-[0.1em] hover:bg-[#ff5722] transition-all duration-300 uppercase shadow-lg shadow-[#EE4D2D]/20">
+                  <ShoppingBag size={14} /> Shop on Shopee
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        {/* FOOTER */}
+        <footer className="mt-20 py-12 border-t border-zinc-100 dark:border-zinc-900 text-center">
+          <div className="flex flex-col items-center gap-6">
+             <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
+                <div className="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                  <ShieldCheck size={16} className="text-[#EE4D2D]"/> Buyer Protected
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                  <Truck size={16} className="text-[#EE4D2D]"/> Nationwide
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                  <Star size={16} className="text-[#EE4D2D]"/> Top Rated
+                </div>
+             </div>
+             
+             <div className="bg-zinc-100 dark:bg-zinc-900 px-6 py-2 rounded-full">
+                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">
+                  © 2026 EL GUAPO DIRECTORY
+                </p>
+             </div>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 };
