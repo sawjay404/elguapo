@@ -1,43 +1,58 @@
-import React, { useState } from 'react'
-import Navbar from './assets/Components/Navbar/Navbar'
-import HeroSection from './assets/Components/HeroSection/HeroSection'
-import Services from './assets/Components/Services/Services'
-import About from './assets/Components/About/About'
-import Portfolio from './assets/Components/Portfolio/Portfolio'
-import Testimonials from './assets/Components/Testimonials/Testimonials'
-import Contact from './assets/Components/Contact/Contact'
-import Footer from './assets/Components/Footer/Footer'
-import FormModal from './assets/Components/Form/FormModal' // NEW IMPORT
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './assets/Components/HeroSection/HeroSection';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
-const App = () => {
-  const [showPopup, setShowPopup] = useState(false);
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize theme from localStorage or default to dark
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('elguapo_theme') !== 'light';
+  });
 
-  // Helper to make the code cleaner
-  const openForm = () => setShowPopup(true);
+  useEffect(() => {
+    const token = localStorage.getItem('elguapo_token');
+    if (token) setIsAuthenticated(true);
+  }, []);
+
+  // Theme Toggler Logic
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('elguapo_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('elguapo_theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   return (
-    <div className="relative font-sans antialiased selection:bg-cyan-100 selection:text-cyan-900">
-      
-      <Navbar setIsFormOpen={openForm} />
-      
-      <main>
-        <HeroSection setIsFormOpen={openForm} />
-        <Services setIsFormOpen={openForm} />
-        <About setIsFormOpen={openForm} />
-        <Portfolio setIsFormOpen={openForm} /> {/* Fixed typo here */}
-        <Testimonials setIsFormOpen={openForm} />
-        <Contact setIsFormOpen={openForm} />
-      </main>
-      
-      <Footer setIsFormOpen={openForm} />
+    <Router>
+      <Routes>
+        {/* Pass theme and toggle function to Home */}
+        <Route path="/" element={<Home isDarkMode={isDarkMode} toggleTheme={toggleTheme} />} />
+        
+        <Route 
+          path="/login" 
+          element={<Login setIsAuthenticated={setIsAuthenticated} isDarkMode={isDarkMode} />} 
+        />
 
-      {/* The Master Modal 
-          This stays at the bottom of the DOM so it covers everything.
-      */}
-      <FormModal isOpen={showPopup} setIsOpen={setShowPopup} />
-      
-    </div>
-  )
+        <Route 
+          path="/dashboard" 
+          element={
+            isAuthenticated ? (
+              <Dashboard setIsAuthenticated={setIsAuthenticated} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
+        />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
